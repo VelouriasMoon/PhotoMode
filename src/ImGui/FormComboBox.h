@@ -7,16 +7,26 @@ namespace ImGui
 {
 	constexpr auto allMods = "$PM_ALL"sv;
 	constexpr auto ffForms = "$PM_FF_Forms"sv;
+	constexpr auto InvItems = "$PM_Items"sv;
 
 	template <class T>
 	class FormComboBox
 	{
 	public:
+
 		void AddForm(const std::string& a_edid, T* a_form)
 		{
 			if (edidForms.emplace(a_edid, a_form).second) {
 				edids.push_back(a_edid);
 			}
+		}
+		void InitForms(RE::TESObjectREFR::InventoryItemMap a_items)
+		{
+			for (const auto& form : a_items) {
+				if (form.first->Is(RE::FormType::Weapon, RE::FormType::Armor))
+					AddForm(EditorID::GetEditorID(form.first), form.first);
+			}
+			name = InvItems;
 		}
 		void UpdateValidForms(RE::Actor* a_actor = nullptr)
 		{
@@ -66,9 +76,44 @@ namespace ImGui
 			}
 			return nullptr;
 		}
+		
+		void GetFormResultFromCombo(std::function<void(T*)> a_func, RE::Actor* a_actor = nullptr)
+		{
+			T* formResult;
+
+			if (!translated) {
+				name = TRANSLATE_S(name);
+				translated = true;
+			}
+
+			ImGui::BeginGroup();
+			{
+				ImGui::SeparatorText(name.c_str());
+
+				ImGui::PushStyleColor(ImGuiCol_NavHighlight, IM_COL32(255, 255, 255, 204));
+				ImGui::PushStyleColor(ImGuiCol_Header, GetColorU32(ImGuiCol_TextDisabled));
+
+				ImGui::PushID(name.c_str());
+				ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+
+				formResult = GetComboWithFilterResult(a_actor);
+
+				ImGui::PopItemWidth();
+				ImGui::PopID();
+				ImGui::PopStyleColor(2);
+			}
+			ImGui::EndGroup();
+
+			if (formResult) {
+				a_func(formResult);
+			}
+		}
 
 	private:
 		// members
+		std::string name;
+		bool        translated{ false };
+
 		StringMap<T*>            edidForms{};
 		std::vector<std::string> edids{};
 		std::int32_t             index{};

@@ -100,6 +100,7 @@ namespace PhotoMode
 		effectShaders.InitForms();
 		effectVFX.InitForms();
 		idles.InitForms();
+		items.InitForms(character->GetInventory());
 	}
 
 	void Character::RevertState()
@@ -136,6 +137,10 @@ namespace PhotoMode
 			RevertIdle();
 			idlePlayed = false;
 		}
+
+		//revert inventroy
+		items.ResetIndex();
+		items.SetValid(false);
 
 		// revert effects
 		effectShaders.Reset();
@@ -181,7 +186,7 @@ namespace PhotoMode
 		{
 			if (ImGui::BeginTabBarCustom("Player#TopBar", 0)) {
 				// ugly af, improve later
-				const float width = ImGui::GetContentRegionAvail().x / 4;
+				const float width = ImGui::GetContentRegionAvail().x / 5;
 
 				if (a_resetTabs) {
 					ImGui::SetKeyboardFocusHere();
@@ -243,6 +248,24 @@ namespace PhotoMode
 						}
 					},
 						character);
+					ImGui::EndTabItem();
+				}
+
+				ImGui::SetNextItemWidth(width);
+				if (ImGui::OpenTabOnHover("$PM_Inventory"_T)) {
+					items.GetFormResultFromCombo([&](const auto& a_item) {
+						
+						auto inv = character->GetInventory();
+						RE::TESObjectREFR::InventoryItemMap::const_iterator item = inv.find(a_item);
+						if (item != inv.end()) {
+							if (item->second.second->IsWorn())
+								RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_item);
+							else
+								RE::ActorEquipManager::GetSingleton()->EquipObject(character, a_item);
+						}
+					},
+						character);
+					character->Update(1.0f);
 					ImGui::EndTabItem();
 				}
 
