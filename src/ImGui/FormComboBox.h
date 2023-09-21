@@ -22,9 +22,19 @@ namespace ImGui
 		}
 		void InitForms(RE::TESObjectREFR::InventoryItemMap a_items)
 		{
-			for (const auto& form : a_items) {
-				if (form.first->Is(RE::FormType::Weapon, RE::FormType::Armor))
-					AddForm(EditorID::GetEditorID(form.first), form.first);
+			for (const auto& a_item : a_items) {
+				if (a_item.first->Is(RE::FormType::Weapon, RE::FormType::Armor) && a_item.first->GetPlayable() && a_item.second.first > 0)
+				{
+					const char* name = nullptr;
+					auto gmst = RE::GameSettingCollection::GetSingleton();
+					auto sMissingName = gmst ? gmst->GetSetting("sMissingName") : nullptr;
+					name = sMissingName ? sMissingName->GetString() : "";
+
+					if (a_item.second.second->GetDisplayName() == name)
+						AddForm(EditorID::GetEditorID(a_item.first), a_item.first);
+					else
+						AddForm(a_item.second.second->GetDisplayName(), a_item.first);
+				}
 			}
 			name = InvItems;
 		}
