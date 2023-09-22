@@ -16,6 +16,7 @@ namespace PhotoMode::Hotkeys
 		nextTab.LoadKeys(a_ini, "iNextTab");
 		previousTab.LoadKeys(a_ini, "iPreviousTab");
 		freezeTime.LoadKeys(a_ini, "iFreezeTime");
+		drawWeaponsInput.LoadKeys(a_ini, "iDrawWeaponsInput");
 	}
 
 	void Manager::TogglePhotoMode(RE::InputEvent* const* a_event)
@@ -155,6 +156,11 @@ namespace PhotoMode::Hotkeys
 		return freezeTime.GetKey();
 	}
 
+	std::uint32_t Manager::DrawWeaponsInputKey() const
+	{
+		return drawWeaponsInput.GetKey();
+	}
+
 	std::uint32_t Manager::EscapeKey()
 	{
 		if (Input::GetInputType() == Input::TYPE::kKeyboard) {
@@ -191,6 +197,11 @@ namespace PhotoMode::Hotkeys
 	const IconFont::IconData* Manager::FreezeTimeIcon() const
 	{
 		return MANAGER(IconFont)->GetIcon(freezeTime.GetKey());
+	}
+
+	const IconFont::IconData* Manager::DrawWeaponsInputIcon() const
+	{
+		return MANAGER(IconFont)->GetIcon(drawWeaponsInput.GetKey());
 	}
 
 	std::set<const IconFont::IconData*> Manager::TogglePhotoModeIcons() const

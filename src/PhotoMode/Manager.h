@@ -32,6 +32,7 @@ namespace PhotoMode
 
 		[[nodiscard]] bool IsHidden() const;
 		void               ToggleUI();
+		void               DrawWeapons();
 
 		void NavigateTab(bool a_left);
 

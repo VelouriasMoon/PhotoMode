@@ -20,6 +20,7 @@ namespace PhotoMode::Hotkeys
 		std::uint32_t        NextTabKey() const;
 		std::uint32_t        PreviousTabKey() const;
 		std::uint32_t        FreezeTimeKey() const;
+		std::uint32_t        DrawWeaponsInputKey() const;
 		static std::uint32_t EscapeKey();
 
 		const IconFont::IconData* ResetIcon() const;
@@ -28,6 +29,7 @@ namespace PhotoMode::Hotkeys
 		const IconFont::IconData* NextTabIcon() const;
 		const IconFont::IconData* PreviousTabIcon() const;
 		const IconFont::IconData* FreezeTimeIcon() const;
+		const IconFont::IconData* DrawWeaponsInputIcon() const;
 
 		std::set<const IconFont::IconData*> TogglePhotoModeIcons() const;
 
@@ -77,6 +79,7 @@ namespace PhotoMode::Hotkeys
 		Key toggleMenus;
 		Key reset;
 		Key freezeTime;
+		Key drawWeaponsInput;
 	};
 }
 namespace Hotkeys = PhotoMode::Hotkeys;

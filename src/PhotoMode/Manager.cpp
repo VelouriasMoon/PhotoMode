@@ -83,6 +83,15 @@ namespace PhotoMode
 		}
 	}
 
+	void Manager::DrawWeapons() 
+	{
+		const auto player = RE::PlayerCharacter::GetSingleton();
+		if (player->IsWeaponDrawn())
+			player->DrawWeaponMagicHands(false);
+		else
+			player->DrawWeaponMagicHands(true);
+	}
+
 	void Manager::Activate()
 	{
 		cameraTab.GetOriginalState();
@@ -508,11 +517,13 @@ namespace PhotoMode
 			const static auto toggleMenusLabel = "$PM_TOGGLEMENUS"_T;
 			const auto        resetLabel = GetResetAll() ? "$PM_RESET_ALL"_T : "$PM_RESET"_T;
 			const static auto freezeTimeLabel = "$PM_FREEZETIME"_T;
+			const static auto drawWeaponsInputLabel = "$PM_DRAWWEAPONSCONTROL"_T;
 
 			const auto& takePhotoIcon = MANAGER(Hotkeys)->TakePhotoIcon();
 			const auto& toggleMenusIcon = MANAGER(Hotkeys)->ToggleMenusIcon();
 			const auto& resetIcon = MANAGER(Hotkeys)->ResetIcon();
 			const auto& freezeTimeIcon = MANAGER(Hotkeys)->FreezeTimeIcon();
+			const auto& drawWeaponsInputIcon = MANAGER(Hotkeys)->DrawWeaponsInputIcon();
 
 			// const static auto togglePMLabel = "$PM_EXIT"_T;
 			// const auto& togglePMIcons = MANAGER(Hotkeys)->TogglePhotoModeIcons();
@@ -532,6 +543,7 @@ namespace PhotoMode
 			calc_width(takePhotoIcon, takePhotoLabel);
 			calc_width(toggleMenusIcon, toggleMenusLabel);
 			calc_width(freezeTimeIcon, freezeTimeLabel);
+			calc_width(drawWeaponsInputIcon, drawWeaponsInputLabel);
 			calc_width(resetIcon, resetLabel);
 
 			/*for (const auto& icon : togglePMIcons) {
@@ -552,6 +564,7 @@ namespace PhotoMode
 			draw_button(takePhotoIcon, takePhotoLabel);
 			draw_button(toggleMenusIcon, toggleMenusLabel);
 			draw_button(freezeTimeIcon, freezeTimeLabel);
+			draw_button(drawWeaponsInputIcon, drawWeaponsInputLabel);
 			draw_button(resetIcon, resetLabel);
 
 			// ImGui::ButtonIconWithLabel(togglePMLabel, togglePMIcons, true);
