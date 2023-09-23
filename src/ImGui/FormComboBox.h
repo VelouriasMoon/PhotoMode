@@ -13,6 +13,10 @@ namespace ImGui
 	class FormComboBox
 	{
 	public:
+		FormComboBox(){}
+		FormComboBox(std::string a_name) :
+			name(std::move(a_name))
+		{}
 
 		void AddForm(const std::string& a_edid, T* a_form)
 		{
@@ -20,10 +24,10 @@ namespace ImGui
 				edids.push_back(a_edid);
 			}
 		}
-		void InitForms(RE::TESObjectREFR::InventoryItemMap a_items)
+		void InitForms(RE::TESObjectREFR::InventoryItemMap a_items, RE::FormType a_type)
 		{
 			for (const auto& a_item : a_items) {
-				if (a_item.first->Is(RE::FormType::Weapon, RE::FormType::Armor) && a_item.first->GetPlayable() && a_item.second.first > 0)
+				if (a_item.first->Is(a_type) && a_item.first->GetPlayable() && a_item.second.first > 0)
 				{
 					const char* name = nullptr;
 					auto gmst = RE::GameSettingCollection::GetSingleton();
@@ -36,7 +40,17 @@ namespace ImGui
 						AddForm(a_item.second.second->GetDisplayName(), a_item.first);
 				}
 			}
-			name = InvItems;
+			//name = InvItems;
+		}
+		void InitMagic(RE::BSTSmallArray<RE::SpellItem*> a_spells) 
+		{
+			for (const auto& a_spell : a_spells)
+			{
+				if (a_spell->GetSpellType() == RE::MagicSystem::SpellType::kSpell && a_spell->GetPlayable()) 
+				{
+					AddForm(a_spell->GetName(), a_spell);
+				}
+			}
 		}
 		void UpdateValidForms(RE::Actor* a_actor = nullptr)
 		{

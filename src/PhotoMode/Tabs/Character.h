@@ -127,7 +127,10 @@ namespace PhotoMode
 		ImGui::FormComboBoxFiltered<RE::TESEffectShader>    effectShaders{ "$PM_EffectShaders" };
 		ImGui::FormComboBoxFiltered<RE::TESIdleForm>        idles{ "$PM_Idles" };
 		ImGui::FormComboBoxFiltered<RE::BGSReferenceEffect> effectVFX{ "$PM_VisualEffects" };
-		ImGui::FormComboBox<RE::TESBoundObject>             items;
+		ImGui::FormComboBox<RE::TESBoundObject>             weapons{ "$PM_Weapons" };
+		ImGui::FormComboBox<RE::TESBoundObject>             armors{ "$PM_Armors" };
+		ImGui::FormComboBox<RE::SpellItem>                  spellsR{ "$PM_SpellsR" };
+		ImGui::FormComboBox<RE::SpellItem>                  spellsL{ "$PM_SpellsL" };
 
 		MFG::Data mfgData{};
 

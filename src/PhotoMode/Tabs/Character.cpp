@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Utilities/Utils.h"
 
 namespace PhotoMode
 {
@@ -100,7 +101,10 @@ namespace PhotoMode
 		effectShaders.InitForms();
 		effectVFX.InitForms();
 		idles.InitForms();
-		items.InitForms(character->GetInventory());
+		weapons.InitForms(character->GetInventory(), RE::FormType::Weapon);
+		armors.InitForms(character->GetInventory(), RE::FormType::Armor);
+		spellsR.InitMagic(character->addedSpells);
+		spellsL.InitMagic(character->addedSpells);
 	}
 
 	void Character::RevertState()
@@ -139,8 +143,14 @@ namespace PhotoMode
 		}
 
 		//revert inventroy
-		items.ResetIndex();
-		items.SetValid(false);
+		weapons.ResetIndex();
+		weapons.SetValid(false);
+		armors.ResetIndex();
+		armors.SetValid(false);
+		spellsR.ResetIndex();
+		spellsR.SetValid(false);
+		spellsL.ResetIndex();
+		spellsL.SetValid(false);
 
 		// revert effects
 		effectShaders.Reset();
@@ -253,8 +263,15 @@ namespace PhotoMode
 
 				ImGui::SetNextItemWidth(width);
 				if (ImGui::OpenTabOnHover("$PM_Inventory"_T)) {
-					items.GetFormResultFromCombo([&](const auto& a_item) {
+					weapons.GetFormResultFromCombo([&](const auto& a_item) {
 						
+						if (character->GetEquippedObject(false) == a_item || character->GetEquippedObject(true) == a_item)
+							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_item);
+						else
+							RE::ActorEquipManager::GetSingleton()->EquipObject(character, a_item);
+					},
+						character);
+					armors.GetFormResultFromCombo([&](const auto& a_item) {
 						auto inv = character->GetInventory();
 						RE::TESObjectREFR::InventoryItemMap::const_iterator item = inv.find(a_item);
 						if (item != inv.end()) {
@@ -263,6 +280,25 @@ namespace PhotoMode
 							else
 								RE::ActorEquipManager::GetSingleton()->EquipObject(character, a_item);
 						}
+					},
+						character);
+					spellsR.GetFormResultFromCombo([&](const auto& a_spell) {
+						if (character->GetEquippedObject(false) == a_spell)
+						{
+							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell);
+							character->DeselectSpell(a_spell);
+						}
+						else
+							RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetRightHandSlot());
+						
+					},
+						character);
+					spellsL.GetFormResultFromCombo([&](const auto& a_spell) {
+						if (character->GetEquippedObject(true) == a_spell) {
+							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell);
+							character->DeselectSpell(a_spell);
+						} else
+							RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetLeftHandSlot());
 					},
 						character);
 					character->Update(1.0f);
