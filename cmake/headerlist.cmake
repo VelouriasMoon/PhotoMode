@@ -27,4 +27,5 @@ set(headers ${headers}
 	src/Screenshots/Manager.h
 	src/Settings.h
 	src/Translation.h
+	src/Utilities/Utils.h
 )

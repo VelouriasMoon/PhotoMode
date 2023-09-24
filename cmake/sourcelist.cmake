@@ -20,5 +20,6 @@ set(sources ${sources}
 	src/Screenshots/Manager.cpp
 	src/Settings.cpp
 	src/Translation.cpp
+	src/Utilities/Utils.cpp
 	src/main.cpp
 )
