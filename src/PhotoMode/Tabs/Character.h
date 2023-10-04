@@ -131,7 +131,9 @@ namespace PhotoMode
 		ImGui::FormComboBox<RE::TESBoundObject>             armors{ "$PM_Armors" };
 		ImGui::FormComboBox<RE::SpellItem>                  spellsR{ "$PM_SpellsR" };
 		ImGui::FormComboBox<RE::SpellItem>                  spellsL{ "$PM_SpellsL" };
+		std::vector<RE::SpellItem*>                         SpellList;
 
+		RE::TESObjectREFR::InventoryItemMap inventory{};
 		MFG::Data mfgData{};
 
 		State originalState{};

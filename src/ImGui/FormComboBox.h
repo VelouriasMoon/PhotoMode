@@ -27,6 +27,7 @@ namespace ImGui
 		void InitForms(RE::TESObjectREFR::InventoryItemMap a_items, RE::FormType a_type)
 		{
 			for (const auto& a_item : a_items) {
+				//logger::info(FMT_STRING("{}: {}"), EditorID::GetEditorID(a_item.first), a_item.first->GetFormType());
 				if (a_item.first->Is(a_type) && a_item.first->GetPlayable() && a_item.second.first > 0)
 				{
 					const char* name = nullptr;
@@ -42,7 +43,7 @@ namespace ImGui
 			}
 			//name = InvItems;
 		}
-		void InitMagic(RE::BSTSmallArray<RE::SpellItem*> a_spells) 
+		void InitMagic(std::vector<RE::SpellItem*> a_spells) 
 		{
 			for (const auto& a_spell : a_spells)
 			{
@@ -88,6 +89,16 @@ namespace ImGui
 		void SetValid(bool a_valid)
 		{
 			valid = a_valid;
+		}
+		int GetCount()
+		{
+			return edids.size();
+		}
+		void ResetAndClear()
+		{
+			index = 0;
+			edidForms.clear();
+			edids.clear();
 		}
 
 		T* GetComboWithFilterResult(RE::Actor* a_actor = nullptr)

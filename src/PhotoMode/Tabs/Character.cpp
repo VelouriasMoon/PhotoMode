@@ -87,6 +87,12 @@ namespace PhotoMode
 			characterName = fmt::format("{} [0x{:X}]", a_actor->GetName(), a_actor->GetFormID());
 		}
 
+		for (const auto& a_spell : character->addedSpells) {
+			if (a_spell) {
+				SpellList.push_back(a_spell);
+			}
+		}
+
 		GetOriginalState();
 
 		if (!character->IsPlayerRef()) {
@@ -103,8 +109,10 @@ namespace PhotoMode
 		idles.InitForms();
 		weapons.InitForms(character->GetInventory(), RE::FormType::Weapon);
 		armors.InitForms(character->GetInventory(), RE::FormType::Armor);
-		spellsR.InitMagic(character->addedSpells);
-		spellsL.InitMagic(character->addedSpells);
+
+		spellsR.InitMagic(SpellList);
+		spellsL.InitMagic(SpellList);
+
 	}
 
 	void Character::RevertState()
@@ -143,14 +151,15 @@ namespace PhotoMode
 		}
 
 		//revert inventroy
-		weapons.ResetIndex();
+		weapons.ResetAndClear();
 		weapons.SetValid(false);
-		armors.ResetIndex();
+		armors.ResetAndClear();
 		armors.SetValid(false);
-		spellsR.ResetIndex();
+		spellsR.ResetAndClear();
 		spellsR.SetValid(false);
-		spellsL.ResetIndex();
+		spellsL.ResetAndClear();
 		spellsL.SetValid(false);
+		SpellList.clear();
 
 		// revert effects
 		effectShaders.Reset();
@@ -263,44 +272,61 @@ namespace PhotoMode
 
 				ImGui::SetNextItemWidth(width);
 				if (ImGui::OpenTabOnHover("$PM_Inventory"_T)) {
-					weapons.GetFormResultFromCombo([&](const auto& a_item) {
-						
-						if (character->GetEquippedObject(false) == a_item || character->GetEquippedObject(true) == a_item)
-							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_item);
-						else
-							RE::ActorEquipManager::GetSingleton()->EquipObject(character, a_item);
-					},
-						character);
-					armors.GetFormResultFromCombo([&](const auto& a_item) {
-						auto inv = character->GetInventory();
-						RE::TESObjectREFR::InventoryItemMap::const_iterator item = inv.find(a_item);
-						if (item != inv.end()) {
-							if (item->second.second->IsWorn())
-								RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_item);
-							else
-								RE::ActorEquipManager::GetSingleton()->EquipObject(character, a_item);
-						}
-					},
-						character);
-					spellsR.GetFormResultFromCombo([&](const auto& a_spell) {
-						if (character->GetEquippedObject(false) == a_spell)
-						{
-							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell);
-							character->DeselectSpell(a_spell);
-						}
-						else
-							RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetRightHandSlot());
-						
-					},
-						character);
-					spellsL.GetFormResultFromCombo([&](const auto& a_spell) {
-						if (character->GetEquippedObject(true) == a_spell) {
-							RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell);
-							character->DeselectSpell(a_spell);
-						} else
-							RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetLeftHandSlot());
-					},
-						character);
+					
+					if (weapons.GetCount() > 0) {
+						weapons.GetFormResultFromCombo([&](const auto& a_item) {
+							auto AE = RE::ActorEquipManager::GetSingleton();
+							if (a_item && AE && character) {
+								if (character->GetEquippedObject(false) == a_item || character->GetEquippedObject(true) == a_item)
+									AE->UnequipObject(character, a_item);
+								else
+									AE->EquipObject(character, a_item);
+							}
+						},
+							character);
+					}
+					if (armors.GetCount() > 0) {
+						armors.GetFormResultFromCombo([&](const auto& a_item) {
+							auto AE = RE::ActorEquipManager::GetSingleton();
+							if (a_item && AE && character) {
+								inventory = character->GetInventory();
+								RE::TESObjectREFR::InventoryItemMap::const_iterator item = inventory.find(a_item);
+								if (item != inventory.end()) {
+									if (item->second.second->IsWorn())
+										AE->UnequipObject(character, a_item, nullptr, 1, a_item->As<RE::TESObjectARMO>()->GetEquipSlot());
+									else
+										AE->EquipObject(character, a_item, nullptr, 1, a_item->As<RE::TESObjectARMO>()->GetEquipSlot());
+								}
+							}
+						},
+							character);
+					}
+					if (spellsR.GetCount() > 0) {
+						spellsR.GetFormResultFromCombo([&](const auto& a_spell) {
+							auto AE = RE::ActorEquipManager::GetSingleton();
+							if (a_spell && AE && character) {
+								if (character->GetEquippedObject(false) == a_spell) {
+									RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell, nullptr, 1, Utils::Slot::GetRightHandSlot());
+									character->DeselectSpell(a_spell);
+								} else
+									RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetRightHandSlot());
+							}
+						},
+							character);
+					}
+					if (spellsL.GetCount() > 0) {
+						spellsL.GetFormResultFromCombo([&](const auto& a_spell) {
+							auto AE = RE::ActorEquipManager::GetSingleton();
+							if (a_spell && AE && character) {
+								if (character->GetEquippedObject(true) == a_spell) {
+									RE::ActorEquipManager::GetSingleton()->UnequipObject(character, a_spell, nullptr, 1, Utils::Slot::GetLeftHandSlot());
+									character->DeselectSpell(a_spell);
+								} else
+									RE::ActorEquipManager::GetSingleton()->EquipSpell(character, a_spell, Utils::Slot::GetLeftHandSlot());
+							}
+						},
+							character);
+					}
 					character->Update(1.0f);
 					ImGui::EndTabItem();
 				}
