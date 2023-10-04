@@ -87,6 +87,14 @@ namespace PhotoMode
 			characterName = fmt::format("{} [0x{:X}]", a_actor->GetName(), a_actor->GetFormID());
 		}
 
+		//Initiate a list of spells for the character, not the best way to do this but i can't figure out a better way
+		RE::SpellItem* flames = RE::TESForm::LookupByEditorID("Flames")->As<RE::SpellItem>();
+		if (flames->GetFormID() == 0x00012FCD && character->HasSpell(flames))
+			SpellList.push_back(flames);
+		RE::SpellItem* healing = RE::TESForm::LookupByEditorID("Healing")->As<RE::SpellItem>();
+		if (healing->GetFormID() == 0x00012FCC && character->HasSpell(healing))
+			SpellList.push_back(healing);
+
 		for (const auto& a_spell : character->addedSpells) {
 			if (a_spell) {
 				SpellList.push_back(a_spell);
